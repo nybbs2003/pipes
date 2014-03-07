@@ -36,13 +36,17 @@
 package org.jaudiolibs.pipes.impl;
 
 import java.nio.FloatBuffer;
-import org.jaudiolibs.audioservers.AudioConfiguration;
-import org.jaudiolibs.pipes.BufferRateListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.jaudiolibs.audioservers.AudioClient;
-import org.jaudiolibs.pipes.*;
+import org.jaudiolibs.audioservers.AudioConfiguration;
+import org.jaudiolibs.pipes.Buffer;
+import org.jaudiolibs.pipes.BufferRateListener;
+import org.jaudiolibs.pipes.Bus;
+import org.jaudiolibs.pipes.Pipe;
+import org.jaudiolibs.pipes.SinkIsFullException;
+import org.jaudiolibs.pipes.SourceIsFullException;
 
 /**
  *
@@ -92,7 +96,6 @@ public class BusClient implements Bus, AudioClient {
         confListeners = new ConfigurationListener[0];
     }
 
-    @Override
     public void addBufferRateListener(BufferRateListener listener) {
         if (listener == null) {
             throw new NullPointerException();
@@ -104,7 +107,6 @@ public class BusClient implements Bus, AudioClient {
         listeners = Utils.arrayAdd(listeners, listener);
     }
 
-    @Override
     public void removeBufferRateListener(BufferRateListener listener) {
 //        listeners.remove(listener);
         listeners = Utils.arrayRemove(listeners, listener);
@@ -121,27 +123,22 @@ public class BusClient implements Bus, AudioClient {
         confListeners = Utils.arrayRemove(confListeners, listener);
     }
 
-    @Override
     public long getTime() {
         return time;
     }
 
-    @Override
     public Pipe getSink(int index) {
         return sinks[index];
     }
 
-    @Override
     public int getSinkCount() {
         return sinks.length;
     }
 
-    @Override
     public Pipe getSource(int index) {
         return sources[index];
     }
 
-    @Override
     public int getSourceCount() {
         return sources.length;
     }
@@ -159,7 +156,6 @@ public class BusClient implements Bus, AudioClient {
         }
     }
 
-    @Override
     public void configure(AudioConfiguration context) throws Exception {
         if (!context.isFixedBufferSize()) {
             throw new IllegalArgumentException("BusClient can currently only work with fixed buffer sizes.");
@@ -196,7 +192,6 @@ public class BusClient implements Bus, AudioClient {
         }
     }
 
-    @Override
     public boolean process(long time, List<FloatBuffer> inputs, List<FloatBuffer> outputs, int nframes) {
         if (nframes != bufferSize) {
             // @TODO allow variable buffer sizes
@@ -264,7 +259,6 @@ public class BusClient implements Bus, AudioClient {
         }
     }
 
-    @Override
     public void shutdown() {
         for (OutputSink sink : sinks) {
             sink.active = false;
